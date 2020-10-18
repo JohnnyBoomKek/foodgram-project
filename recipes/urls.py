@@ -1,4 +1,4 @@
-from django.urls import inclucde, path
+from django.urls import include, path
 from . import views
 
 urlpatterns = [
