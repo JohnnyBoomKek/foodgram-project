@@ -1,7 +1,11 @@
 <div class="card" data-id="120">
-    {%load static %}
-    <a href="#" class="link" target="_blank"><img src={% static "./images/testCardImg.png" %} alt="Какой-то текст"
+    {% load thumbnail %}
+    {% thumbnail recipe.image "480x480" crop="center" upscale=True as im %}
+        <!-- <img class="card-img" src="{{ im.url }}"> -->
+        <a href="#" class="link" target="_blank"><img src="{{ im.url }}" alt="тут должна быть пикча"
             class="card__image"></a>
+    {% endthumbnail %}
+    
     <div class="card__body">
         <a class="card__title link" href="#" target="_blank">{{ recipe.title }}</a>
         <ul class="card__items">
@@ -18,6 +22,12 @@
             <p class="card__text"><span class="icon-user"></span> <a href="#" style="color: black">{{ recipe.author }}</a></p>
         </div>
     </div>
+    <!--  УБРАТЬ ПЕРЕД РЕВЬЮ {% for ingredient in recipe.ingredients.all %}
+    {{ ingredient }} 
+    {% endfor %}
+    {% for ingredient in recipe.ingredient_quantity.all %}
+    {{ ingredient.quantity }} 
+    {% endfor %} -->
     <div class="card__footer">
         <button class="button button_style_light-blue" name="purchases" data-out><span
                 class="icon-plus button__icon"></span>Добавить в покупки</button>

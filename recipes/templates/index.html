@@ -5,16 +5,16 @@
 
 <div class="main__header">
     <h1 class="main__title">Рецепты</h1>
-<!-- tags go here -->
+    <!-- tags go here -->
 </div>
 <div class="card-list">
     {% for recipe in page %}
-    {% include 'card.html' %}
+    {% include 'card.html' with recipe=recipe %}
     {% endfor %}
-<!-- recipies go here -->
-<!-- paginator goes gere -->
-{% if page.has_other_pages %}
-{% include 'paginator.html' %}
-{% endif %}
+    <!-- recipies go here -->
+    <!-- paginator goes gere -->
+    {% if page.has_other_pages %}
+    {% include 'paginator.html' %}
+    {% endif %}
 </div>
 {% endblock %}
