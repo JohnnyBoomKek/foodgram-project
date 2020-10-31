@@ -1,18 +1,22 @@
 {% extends "base.html" %}
 {% block title %} Создание рецепта {% endblock %}
+{% load static %}
 {% block content %}
-
+    {% csrf_token %}
     {{ form.as_p }}
     <div class="main__header">
         <h1 class="main__title">Создание рецепта</h1>
     </div>
     <div class="form-container">
         <form class="form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
             <div class="form__group">
-                <label for="id_name" class="form__label">Название рецепта</label>
+                <label for="id_title" class="form__label">Название рецепта</label>
                 <div class="form__field-group">
-                    <input type="text" id="id_name" name="name" class="form__input">
-                    <span class="form__error"></span>
+                    <input type="text" name="title" maxlength="200" required id="id_title" class="form__input">
+                    <span class="form__error">
+                        <ul class="errorlist"></ul>
+                    </span>
                 </div>
             </div>
             <div class="form__group">
@@ -83,4 +87,10 @@
 
 
 {% endblock %}
-        
+{% block scripts %}
+<script src={% static "./js/config/config.js" %}></script>
+<script src={% static "./js/components/Header.js" %}></script>
+<script src={% static "./js/utils/debouncing.js" %}></script>
+<script src={% static "./js/api/Api.js" %}></script>
+<script src={% static "formRecipe.js" %}></script>
+{% endblock %}

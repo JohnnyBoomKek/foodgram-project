@@ -4,6 +4,8 @@ from django.db import models
 from .models import Recipe, Ingredient, RecipeIngredient
 
 class RecipeForm(forms.ModelForm):
+    ingredients = forms.CharField(max_length=10)
     class Meta:
         model = Recipe
-        fields = ['title', 'tag', 'ingredients', 'image']
+        fields = ['title',  'ingredients', 'image']
+

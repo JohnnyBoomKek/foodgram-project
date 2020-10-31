@@ -3,6 +3,7 @@ from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 
 from .models import Recipe, Ingredient, RecipeIngredient
 from .forms import RecipeForm
@@ -33,3 +34,11 @@ def new(request):
             return redirect('index')
     context = {'form': form}
     return render(request, 'new_recipe.html', context)
+
+def ingredients(request):
+    keyword = request.GET.get('query')
+    if keyword:
+        ingredient_list = Ingredient.objects.values('title').filter(title__icontains=keyword)
+    else:
+        ingredient_list = None
+    return JsonResponse({"ingredientent_list":list(ingredient_list)})
