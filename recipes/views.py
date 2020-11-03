@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.core import serializers
 
 
-from .models import Recipe, Ingredient, RecipeIngredient
+from .models import Recipe, Ingredient, RecipeIngredient, Tag
 from .forms import RecipeForm
 from .serializers import IngredientSerializer
 # Create your views here.
@@ -35,15 +35,16 @@ def new(request):
         while request.POST.get(f'nameIngredient_{i}') is not None:
             ingredients.append([request.POST.get(f'nameIngredient_{i}'), request.POST.get(f'valueIngredient_{i}')])
             i += 1
-        print(ingredients)
         if form.is_valid():
             new_recipe = form.save(commit=False)
             new_recipe.author = request.user
             new_recipe = form.save()
             for ingredient in ingredients:
-                print('this is k[0]', ingredient[0])
                 new_recipe.ingredients.set(Ingredient.objects.filter(title=ingredient[0]))
                 RecipeIngredient.objects.create(recipe=new_recipe, ingredient = Ingredient.objects.get(title=ingredient[0]), quantity = ingredient[1])
+            selected_tags = request.POST.getlist('tag_choice')
+            for tag in selected_tags:
+                new_recipe.tags.add(tag)
             return redirect('index')
         else:
             print("Form is not valid", form.non_field_errors )

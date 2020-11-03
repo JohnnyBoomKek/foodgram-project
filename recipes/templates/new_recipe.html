@@ -9,7 +9,6 @@
         <div class="form-container">
             <form class="form" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                {{ form.non_field_errors }}
                 <div class="form__group">
                     <label for="id_title" class="form__label">Название рецепта</label>
                     <div class="form__field-group">
@@ -22,17 +21,17 @@
                 <div class="form__field-group">
                     <div class="tags">
                         <div class="tags__item">
-                            <input type="checkbox" name="tag_choice" value="1" id="id_tag_choice_0"class="tags__checkbox tags__checkbox_style_orange">
+                            <input type="checkbox" name="tag_choice" value="1" id="id_tag_choice_0" class="tags__checkbox tags__checkbox_style_orange">
                             <label for="id_tag_choice_0" class="tags__label">Завтрак</label>
                         </div>
-                        <!-- <div class="tags__item">
-                            <input type="checkbox" name="lunch" id="id_lunch" class="tags__checkbox tags__checkbox_style_green" checked>
+                        <div class="tags__item">
+                            <input type="checkbox" name="tag_choice" value="2" id="id_tag_choice_1"  class="tags__checkbox tags__checkbox_style_green" checked>
                             <label for="id_lunch" class="tags__label">Обед</label>
                         </div>
                         <div class="tags__item">
-                            <input type="checkbox" name="dinner" id="id_dinner" class="tags__checkbox tags__checkbox_style_purple" checked>
+                            <input type="checkbox" name="tag_choice" value="3" id="id_tag_choice_3"  class="tags__checkbox tags__checkbox_style_purple" checked>
                             <label for="id_dinner" class="tags__label">Ужин</label>
-                        </div> -->
+                        </div>
                     </div>
                     <span class="form__error"></span>
                 </div>

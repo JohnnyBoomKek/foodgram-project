@@ -9,26 +9,28 @@
     <div class="card__body">
         <a class="card__title link" href="#" target="_blank">{{ recipe.title }}</a>
         <ul class="card__items">
-            {% if recipe.tag == 'L' %}
+            {% for tag in recipe.tags.all %}
+            {% if tag.tag_name == 'L' %}
             <li class="card__item"><span class="badge badge_style_green">Обед</span></li>
-            {% elif recipe.tag == 'B' %}
+            {% elif tag.tag_name == 'B' %}
             <li class="card__item"><span class="badge badge_style_orange">Завтрак</span></li>
-            {% elif recipe.tag == 'D' %}
+            {% elif tag.tag_name == 'D' %}
             <li class="card__item"><span class="badge badge_style_purple">Ужин</span></li>
             {% endif %}
+            {% endfor %}
         </ul>
         <div class="card__items card__items_column">
             <p class="card__text"><span class="icon-time"></span> {{ recipe.cooking_time }} минут</p>
             <p class="card__text"><span class="icon-user"></span> <a href="#" style="color: black">{{ recipe.author }}</a></p>
         </div>
     </div>
-    <!--  УБРАТЬ ПЕРЕД РЕВЬЮ {% for ingredient in recipe.ingredients.all %}
+     <!-- УБРАТЬ ПЕРЕД РЕВЬЮ {% for ingredient in recipe.ingredients.all %}
     {{ ingredient }} 
     {% endfor %}
     {% for ingredient in recipe.ingredient_quantity.all %}
     {{ ingredient.quantity }} 
     {% endfor %} -->
-    {{ recipe.tag }}
+
     <div class="card__footer">
         <button class="button button_style_light-blue" name="purchases" data-out><span
                 class="icon-plus button__icon"></span>Добавить в покупки</button>

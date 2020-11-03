@@ -45,6 +45,7 @@ class Recipe(models.Model):
         "date published", auto_now_add=True, db_index=True)
     ingredients = models.ManyToManyField(Ingredient, through=RecipeIngredient)
     tags = models.ManyToManyField(Tag)
+    favorite = models.ManyToManyField(User, related_name='favorite', blank=True)
 
     def __str__(self):
         return self.title
