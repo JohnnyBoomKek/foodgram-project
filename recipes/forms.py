@@ -1,11 +1,15 @@
 from django import forms
 from django.db import models
 
-from .models import Recipe, Ingredient, RecipeIngredient
+from .models import Recipe, Ingredient, RecipeIngredient, Tag
 
 class RecipeForm(forms.ModelForm):
-    ingredients = forms.CharField(max_length=10)
+    tag_choice = forms.ModelMultipleChoiceField(queryset=Tag.objects.all(), required=False, widget=forms.CheckboxSelectMultiple)
+    nameINgredient = forms.CharField(required=False)
+    valueIngredient = forms.IntegerField(required=False)
+
     class Meta:
         model = Recipe
-        fields = ['title',  'ingredients', 'image']
+        fields = ['title', 'tag_choice', 'cooking_time', 'description', 'image']
+        exclude = ('author', 'pub_date', 'tag', 'ingredients')
 
