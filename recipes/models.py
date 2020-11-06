@@ -1,8 +1,14 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.db.models.signals import pre_save
+from django.template.defaultfilters import slugify
 
+
+from .utils import unique_slug_generator
 
 User = get_user_model()
+
+
 
 
 class Ingredient(models.Model):
@@ -15,7 +21,7 @@ class Ingredient(models.Model):
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         'Recipe', related_name='ingredient_quantity', on_delete=models.CASCADE)
-    ingredient = models.ForeignKey('Ingredient', on_delete=models.CASCADE)
+    ingredient = models.ForeignKey('Ingredient', related_name='ingredient',on_delete=models.CASCADE)
     quantity = models.CharField(max_length=200)
 
     def __str__(self):
@@ -37,10 +43,10 @@ class Tag(models.Model):
 class Recipe(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
-    image = models.ImageField(upload_to='recipes/', blank=True, null=True)
+    image = models.ImageField(upload_to='recipes/', blank=True, default='recipes/default.jpg', null=True)
     description = models.TextField()
     cooking_time = models.IntegerField()
-    #slug = models.SlugField(max_length=140, unique=True)
+    slug = models.SlugField(max_length=140, unique=True, null = True, blank = True)
     pub_date = models.DateTimeField(
         "date published", auto_now_add=True, db_index=True)
     ingredients = models.ManyToManyField(Ingredient, through=RecipeIngredient)
@@ -49,3 +55,10 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.title
+
+#unique slug generator related business
+def pre_save_receiver(sender, instance, *args, **kwargs): 
+   if not instance.slug: 
+       instance.slug = unique_slug_generator(instance) 
+
+pre_save.connect(pre_save_receiver, sender = Recipe) 

@@ -7,8 +7,9 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %} Рецепты{% endblock %}</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static "./pages/form.css" %}">
-    <link rel="stylesheet" href="{% static "./pages/index.css" %}">
+    {% block css %}
+    <!-- css goes here -->
+    {% endblock %}
 </head>
 <body class="body">
     {% include 'header.html' %}

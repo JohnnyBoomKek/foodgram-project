@@ -1,15 +1,23 @@
 {% extends 'base.html' %}
 {% block title %}Рецепты {% endblock %}
+{% csrf_token %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static "./pages/index.css" %}">
+{% endblock %}
 {% block content %}
 {% load static %}
 
 <div class="main__header">
     <h1 class="main__title">Рецепты</h1>
     <!-- tags go here -->
+    {% include 'tags.html' %}
 </div>
 <div class="card-list">
     {% for recipe in page %}
     {% include 'card.html' with recipe=recipe %}
+    {% empty %}
+    <h3>Sorry, no recipies were found but you can create a new one <a href='{%url 'new' %}'>here</a>.</h3>
     {% endfor %}
     <!-- recipies go here -->
     <!-- paginator goes gere -->
@@ -17,4 +25,17 @@
     {% include 'paginator.html' %}
     {% endif %}
 </div>
+{% endblock %}
+{% block scripts %}
+<script src={% static "./js/components/MainCards.js" %}></script>
+
+<script src={% static "./js/components/Purchases.js" %}></script>
+<script src={% static "./js/components/Favorites.js" %}></script>
+
+<script src={% static "./js/config/config.js" %}></script>
+<script src={% static "./js/components/CardList.js" %}></script>
+<script src={% static "./js/components/Header.js" %}></script>
+
+<script src={% static "./js/api/Api.js" %}></script>
+<script src={% static "indexAuth.js" %}></script>
 {% endblock %}

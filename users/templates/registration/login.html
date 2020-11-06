@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
-{% block title %}Создать аккаунт {% endblock %}
+{% block title %}Войти на сайт{% endblock %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static "./pages/form.css" %}">
+{% endblock %}
 {% block content %}
     <main class="main container">
         <div class="main__header">
