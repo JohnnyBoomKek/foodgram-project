@@ -22,9 +22,13 @@ def index(request):
             tags.append(tag)
         else:
             tags.remove(tag)
-    print(tags)
+    
     list_of_tags = Tag.objects.filter(tag_name__in=tags)
-    recipe_list = Recipe.objects.order_by("-pub_date").filter(tags__in=list_of_tags)
+    print(list_of_tags)
+    recipe_list = Recipe.objects.filter(tags__in=list_of_tags).distinct().order_by("-pub_date")
+    veslist = Recipe.objects.all()
+    #print([x.tags for x in recipe_list])
+    #print(veslist)
     paginator = Paginator(recipe_list, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -50,7 +54,6 @@ def new(request):
             new_recipe = form.save(commit=False)
             new_recipe.author = request.user
             new_recipe = form.save()
-            print(ingredients)
             ingredients_dict = {}
             for pair in ingredients:
                 name = str(pair[0])
@@ -59,15 +62,12 @@ def new(request):
                     ingredients_dict[name]=val
                 else:
                     ingredients_dict[name]+=val
-            print('this is a dict ', ingredients_dict)
             for ingredient in ingredients_dict.keys():
                 RecipeIngredient.objects.create(recipe=new_recipe, ingredient = Ingredient.objects.get(title=ingredient), quantity = ingredients_dict[ingredient])
             selected_tags = request.POST.getlist('tag_choice')
             for tag in selected_tags:
                 new_recipe.tags.add(tag)
             return redirect('index')
-        else:
-            print("Form is not valid", form.non_field_errors )
     context = {'form': form}
     return render(request, 'new_recipe.html', context)
 
