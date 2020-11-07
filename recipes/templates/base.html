@@ -12,7 +12,7 @@
     {% endblock %}
 </head>
 <body class="body">
-    {% include 'header.html' %}
+    {% include 'header.html' with purchases=purchases %}
     <main class="main container">
         {% block content %}
         <!-- content goes here -->

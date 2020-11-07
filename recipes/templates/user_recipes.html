@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Рецепты {% endblock %}
+{% csrf_token %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static "./pages/index.css" %}">
+{% endblock %}
+{% block content %}
+{% load static %}
+
+<div class="main__header">
+    <h1 class="main__title">{{ user.username }}</h1>
+    <!-- tags go here -->
+    {% include 'tags.html' %}
+</div>
+{% csrf_token %}
+{% if user != request.user %}
+{% if not  following %}
+<div class="author-subscribe" data-author={{ user.id }}>
+    <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" data-out>Подписаться на автора</button></p>
+</div>
+{% else %}
+<div class="author-subscribe" data-author={{ user.id }}>
+    <p style="padding: 0 0 2em 0;"><button class="button button_style_light-blue button_size_subscribe" name="subscribe" >Отписаться от автора</button></p>
+</div>
+{% endif %}
+{% endif %}
+<div class="card-list">
+    {% for recipe in page %}
+    {% include 'card.html' with recipe=recipe %}
+    {% empty %}
+    <h3>Sorry, no recipies were found but you can create a new one <a href='{%url 'new' %}'>here</a>.</h3>
+    {% endfor %}
+    <!-- recipies go here -->
+    <!-- paginator goes gere -->
+    {% if page.has_other_pages %}
+    {% include 'paginator.html' %}
+    {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script src={% static "./js/components/MainCards.js" %}></script>
+
+<script src={% static "./js/components/Purchases.js" %}></script>
+<script src={% static "./js/components/Favorites.js" %}></script>
+<script src={% static "./js/components/Subscribe.js" %}></script>
+
+<script src={% static "./js/config/config.js" %}></script>
+<script src={% static "./js/components/AuthorRecipe.js" %}></script>
+<script src={% static "./js/components/Header.js" %}></script>
+
+<script src={% static "./js/api/Api.js" %}></script>
+<script src={% static "authorRecipe.js" %}></script>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% load thumbnail %}
+<li class="shopping-list__item" data-id={{ purchase.recipe.id }}>
+    <a href={% url 'single_recipe' purchase.recipe.slug %}>
+    <div class="recipe recipe_reverse">
+        {% thumbnail purchase.recipe.image "480x480" crop="center" upscale=True as im %}
+        <img src="{{ im.url }}"alt="Изображение" class="recipe__image recipe__image_big">
+        {% endthumbnail %}
+        <h3 class="recipe__title">{{ purchase.recipe.title }}</h3>
+        <p class="recipe__text"><span class="icon-time"></span> {{ purchase.recipe.cooking_time }} мин</p>
+    </div></a>
+    <a href={% url 'remove_purchase' purchase.recipe.id %} class="shopping-list__button link">Удалить</a>
+</li>

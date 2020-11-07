@@ -8,7 +8,7 @@ from django.core import serializers
 
 import json
 
-from .models import Recipe, Ingredient, RecipeIngredient, Tag
+from .models import Recipe, Ingredient, RecipeIngredient, Tag, User, Purchase, Follow
 from .forms import RecipeForm
 from .serializers import IngredientSerializer
 # Create your views here.
@@ -24,18 +24,19 @@ def index(request):
             tags.remove(tag)
     
     list_of_tags = Tag.objects.filter(tag_name__in=tags)
-    print(list_of_tags)
     recipe_list = Recipe.objects.filter(tags__in=list_of_tags).distinct().order_by("-pub_date")
-    veslist = Recipe.objects.all()
-    #print([x.tags for x in recipe_list])
-    #print(veslist)
     paginator = Paginator(recipe_list, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
+    if request.user.is_authenticated:
+        purchases = Purchase.objects.filter(user=request.user)
+    else:
+        purchases = None
     context = {
         'page': page,
         'paginator': paginator,
-        'tags': tags
+        'tags': tags,
+        'purchases':purchases
     }
     return render(request, 'index.html', context)
 
@@ -102,6 +103,7 @@ def remove_favorites(request, id):
     user.favorite.remove(recipe)
     return JsonResponse({'isd':id})
 
+@login_required
 def view_favorites(request):
     tag = request.GET.get('tags')
     if tag is not None:
@@ -122,3 +124,91 @@ def view_favorites(request):
         'user': user
     }
     return render(request, 'index.html', context)
+
+def user_recipe(request, username):
+    tag = request.GET.get('tags')
+    if tag is not None:
+        if tag not in tags:
+            tags.append(tag)
+        else:
+            tags.remove(tag)
+    list_of_tags = Tag.objects.filter(tag_name__in=tags)
+    user = get_object_or_404(User, username=username)
+    following = Follow.objects.filter(user=request.user).filter(author=user)
+    recipe_list = Recipe.objects.filter(tags__in=list_of_tags).distinct().filter(author=user).order_by("-pub_date")
+    paginator = Paginator(recipe_list, 6)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    context = {
+        'page': page,
+        'paginator': paginator,
+        'tags': tags,
+        'user':user,
+        'following':following
+    }
+    return render(request, 'user_recipes.html',context)
+
+@login_required
+def add_purchase(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        recipe = Recipe.objects.get(id = data["id"])
+        if not Purchase.objects.filter(user=request.user, recipe=recipe).exists():
+            Purchase.objects.create(user=request.user, recipe=recipe)
+    return JsonResponse({'s':"s"})
+
+@login_required
+def remove_purchase(request, id):
+    if request.method == "DELETE":
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=id)
+        purchase = get_object_or_404(Purchase, user=user, recipe=recipe)
+        purchase.delete()
+        return JsonResponse({"all":"done"})
+    elif request.method == "GET":
+        user = request.user
+        recipe = get_object_or_404(Recipe, id=id)
+        purchase = get_object_or_404(Purchase, user=user, recipe=recipe)
+        purchase.delete()
+        return redirect('shopping_list')
+
+@login_required
+def shopping_list(request):
+    user = request.user
+    purchases = Purchase.objects.filter(user=user)
+    return render(request,'shopping_list.html', {'purchases':purchases})
+
+@login_required
+def profile_follow(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        profile = get_object_or_404(User, id=data['id'])
+        following = Follow.objects.filter(user=request.user).filter(author=profile)
+        if request.user != profile:
+            if not following:
+                print('you are now following this author')
+                Follow.objects.create(user=request.user, author=profile)
+                return JsonResponse({'success':True})
+            elif following:
+                print('already following')
+                return redirect('index')
+
+@login_required
+def profile_unfollow(request, id):
+    if request.method == "DELETE":
+        profile = get_object_or_404(User, id=id)
+        if profile == request.user:
+            return redirect('index')
+        unfollow = Follow.objects.get(user=request.user, author=profile)
+        unfollow.delete()
+        print('You are not following this author anymore')
+    return JsonResponse({'success':True})
+        
+
+@login_required
+def subscriptions_view(request):
+    user = request.user
+    context = {
+        'user':user
+    }
+    return render(request, 'subscriptions.html', context)

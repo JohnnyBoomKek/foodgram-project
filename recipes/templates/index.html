@@ -8,6 +8,7 @@
 {% block content %}
 {% load static %}
 
+
 <div class="main__header">
     <h1 class="main__title">Рецепты</h1>
     <!-- tags go here -->
@@ -24,6 +25,7 @@
     {% if page.has_other_pages %}
     {% include 'paginator.html' %}
     {% endif %}
+    
 </div>
 {% endblock %}
 {% block scripts %}

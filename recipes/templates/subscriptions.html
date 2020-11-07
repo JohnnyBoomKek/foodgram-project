@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Мои Подписки {% endblock %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static "./pages/myFollow.css" %}">
+{% endblock %}
+{% block content %}
+{% csrf_token %}
+<div class="main__header">
+    <h1 class="main__title">Мои подписки</h1>
+</div>
+<div class="card-list">
+{% for follower in user.follower.all %}
+{% include 'subscription_card.html' with author=follower.author %}
+{% endfor %}
+</div>
+
+{% endblock %}
+{% block scripts %}
+<script src={% static "./js/config/config.js" %}></script>
+<script src={% static "./js/components/MainCards.js" %}></script>
+<script src={% static "./js/components/MyFollow.js" %}></script>
+<script src={% static "./js/components/Subscribe.js" %}></script>
+<script src={% static "./js/components/Header.js" %}></script>
+<script src={% static "./js/api/Api.js" %}></script>
+<script src={% static "myFollow.js" %}></script>
+{% endblock %}
