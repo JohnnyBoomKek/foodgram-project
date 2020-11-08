@@ -72,6 +72,24 @@ def new(request):
     context = {'form': form}
     return render(request, 'new_recipe.html', context)
 
+@login_required
+def edit_recipe(request, slug):
+    recipe = Recipe.objects.get(slug=slug)
+    if recipe.author != request.user:
+        raise Http404
+    if request.method != 'POST':
+        form = RecipeForm(instance=recipe)
+    else:
+        form = RecipeForm(request.POST or None,
+                        files=request.FILES or None, instance=recipe)
+        if form.is_valid():
+            form.save()
+            return redirect('single_recipe', slug)
+    context = {'recipe': recipe, 'form': form}
+    return render(request, "edit_recipe.html", context)
+
+
+
 def ingredients(request):
     keyword = request.GET.get('query')
     if keyword:
@@ -113,7 +131,7 @@ def view_favorites(request):
             tags.remove(tag)
     list_of_tags = Tag.objects.filter(tag_name__in=tags)
     user = request.user
-    recipe_list = user.favorite.all().order_by("-pub_date").filter(tags__in=list_of_tags)
+    recipe_list = user.favorite.all().order_by("-pub_date").filter(tags__in=list_of_tags).distinct()
     paginator = Paginator(recipe_list, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -186,11 +204,9 @@ def profile_follow(request):
         following = Follow.objects.filter(user=request.user).filter(author=profile)
         if request.user != profile:
             if not following:
-                print('you are now following this author')
                 Follow.objects.create(user=request.user, author=profile)
                 return JsonResponse({'success':True})
             elif following:
-                print('already following')
                 return redirect('index')
 
 @login_required
@@ -207,8 +223,13 @@ def profile_unfollow(request, id):
 
 @login_required
 def subscriptions_view(request):
-    user = request.user
+    following_list = request.user.follower.all()
+    paginator = Paginator(following_list, 3)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
     context = {
-        'user':user
+        'page': page,
+        'paginator': paginator,
     }
     return render(request, 'subscriptions.html', context)
+

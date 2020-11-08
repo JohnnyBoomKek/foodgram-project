@@ -15,18 +15,17 @@
     {% include 'tags.html' %}
 </div>
 <div class="card-list">
+    <!-- recipies go here -->
     {% for recipe in page %}
     {% include 'card.html' with recipe=recipe %}
     {% empty %}
     <h3>Sorry, no recipies were found but you can create a new one <a href='{%url 'new' %}'>here</a>.</h3>
     {% endfor %}
-    <!-- recipies go here -->
-    <!-- paginator goes gere -->
-    {% if page.has_other_pages %}
-    {% include 'paginator.html' %}
-    {% endif %}
-    
 </div>
+    <!-- paginator goes gere -->
+{% if page.has_other_pages %}
+{% include 'paginator.html' with items=page paginator=paginator %}
+{% endif %}
 {% endblock %}
 {% block scripts %}
 <script src={% static "./js/components/MainCards.js" %}></script>
