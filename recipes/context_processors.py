@@ -1,4 +1,6 @@
-from .models import Purchase
+from .models import Purchase, Tag, Recipe
+from .views import TAGS
+from django.core.paginator import Paginator
 
 
 def add_variable_to_context(request):
@@ -6,6 +8,8 @@ def add_variable_to_context(request):
         purchases = Purchase.objects.filter(user=request.user)
     else:
         purchases = None
-    return {
-        'purchases' : purchases
+    context = {
+        'purchases' : purchases,
+        'tags':TAGS
     }
+    return context

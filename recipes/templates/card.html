@@ -23,6 +23,7 @@
             <p class="card__text"><span class="icon-user"></span> <a href={% url 'user_recipe' recipe.author %} style="color: black">{{ recipe.author }}</a></p>
         </div>
     </div>
+    {% if user.is_authenticated %}
     <div class="card__footer">
         {% csrf_token %} 
         {% if recipe.purchases.all.count != 0 %}
@@ -36,4 +37,5 @@
         <button class="button button_style_none" name="favorites" data-out><span class="icon-favorite"></span></button>
         {% endif %}
     </div>
+    {% endif %}
 </div>

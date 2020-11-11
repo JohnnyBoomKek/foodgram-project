@@ -18,7 +18,7 @@ services:
     env_file:
       - ./.env
   web:
-    image: ekk
+    image: foodgram
     restart: always
     volumes:
       - staticfiles:/code/static
