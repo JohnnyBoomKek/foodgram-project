@@ -4,6 +4,7 @@ version: '3.8'
 volumes:
   postgres_data:
   staticfiles:
+  mediafiles:
 
 # имена и описания контейнеров, которые должны быть развёрнуты
 services:
@@ -22,17 +23,19 @@ services:
     restart: always
     volumes:
       - staticfiles:/code/static
+      - mediafiles:/code/media
     # "зависит от", 
     depends_on:
       - db
     env_file:
       - ./.env 
-
+  nginx:
   nginx:
     image: nginx:alpine
     restart: always
     volumes:
       - staticfiles:/static
+      - mediafiles:/media
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "8080:8080"
