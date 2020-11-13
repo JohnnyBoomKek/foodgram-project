@@ -10,7 +10,7 @@ User = get_user_model()
 
 
 class Ingredient(models.Model):
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=100)
     dimension = models.CharField(max_length=10)
 
     def __str__(self):
