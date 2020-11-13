@@ -6,6 +6,7 @@ with open('./recipes/ingredients.csv', newline='', encoding='utf-8') as File:
     for row in reader:
         ingred = Ingredient(title=row[0], dimension=row[1])
         ingred.save()
+#test
 
 tags = ['B', 'L', 'D']
 for tag in tags:
