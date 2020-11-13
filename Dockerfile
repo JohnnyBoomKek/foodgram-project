@@ -8,5 +8,5 @@ RUN pip install -r /code/requirements.txt
 COPY . /code
 
 WORKDIR /code
-RUN mv .env foodgram
+#RUN mv .env foodgram
 CMD gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000 
