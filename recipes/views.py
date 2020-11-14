@@ -10,6 +10,8 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.core.exceptions import ValidationError
+from django.contrib import messages
 
 
 from .models import Recipe, Ingredient, RecipeIngredient, Tag, User, Purchase, Follow
@@ -22,31 +24,28 @@ from reportlab.pdfgen import canvas
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 
-
-TAGS = ['B', 'L', 'D']
-
-
-def get_list_of_tags(request):
-    tag = request.GET.get('tags')
+def get_tags(request, tags):
+    tag  = request.GET.get('tags')
     if tag is not None:
-        if tag not in TAGS:
-            TAGS.append(tag)
+        if tag in tags:
+            tags.remove(tag)
         else:
-            TAGS.remove(tag)
-    list_of_tags = Tag.objects.filter(tag_name__in=TAGS)
-    return list_of_tags
+            tags.append(tag)
+    list_of_tags = Tag.objects.filter(tag_name__in=tags)
+    return [list_of_tags, tags]
 
-
-def index(request):
-    list_of_tags = get_list_of_tags(request)
-    recipe_list = Recipe.objects.filter(
-        tags__in=list_of_tags).distinct().order_by('-pub_date')
+def index(request, tags=['B','L','D']):
+    tags = get_tags(request, tags)
+    recipe_list = Recipe.objects.all().order_by(
+        "-pub_date").filter(tags__in=tags[0]).distinct()
+    print(recipe_list)
     paginator = Paginator(recipe_list, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     context = {
         'page': page,
         'paginator': paginator,
+        'tags':tags[1]
     }
     return render(request, 'index.html', context)
 
@@ -76,15 +75,27 @@ def new(request):
                 else:
                     ingredients_dict[name] += val
             for ingredient in ingredients_dict.keys():
-                RecipeIngredient.objects.create(recipe=new_recipe, ingredient=Ingredient.objects.get(
+                if Ingredient.objects.filter(title=ingredient).exists():
+                    RecipeIngredient.objects.create(recipe=new_recipe, ingredient=Ingredient.objects.get(
                     title=ingredient), quantity=ingredients_dict[ingredient])
-            selected_tags = request.POST.getlist('tag_choice')
-            for tag in selected_tags:
-                new_recipe.tags.add(tag)
-            return redirect('index')
+                else:
+                    messages.error(request, f"{ingredient} is not in the data base and wont be added to you recipe")
+                return redirect('index')
     context = {'form': form}
     return render(request, 'new_recipe.html', context)
 
+@login_required
+def ingredients(request):
+    keyword = request.GET.get('query')
+    if keyword:
+        ingredient_list = Ingredient.objects.filter(
+            title__contains=keyword).values_list()
+        data_noice = [{'title': x[1], 'dimension': x[2]}
+                      for x in ingredient_list]
+        return JsonResponse(data_noice, safe=False)
+    else:
+        ingredient_list = None
+        return JsonResponse({'Found': "None"})
 
 @login_required
 def edit_recipe(request, slug):
@@ -101,20 +112,6 @@ def edit_recipe(request, slug):
             return redirect('single_recipe', slug)
     context = {'recipe': recipe, 'form': form}
     return render(request, 'edit_recipe.html', context)
-
-
-@login_required
-def ingredients(request):
-    keyword = request.GET.get('query')
-    if keyword:
-        ingredient_list = Ingredient.objects.filter(
-            title__contains=keyword).values_list()
-        data_noice = [{'title': x[1], 'dimension': x[2]}
-                      for x in ingredient_list]
-        return JsonResponse(data_noice, safe=False)
-    else:
-        ingredient_list = None
-        return JsonResponse({'Found': "None"})
 
 
 def single_recipe_view(request, slug):

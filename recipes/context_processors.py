@@ -1,5 +1,4 @@
 from .models import Purchase, Tag, Recipe
-from .views import TAGS
 from django.core.paginator import Paginator
 
 
@@ -10,6 +9,5 @@ def add_variable_to_context(request):
         purchases = None
     context = {
         'purchases' : purchases,
-        'tags':TAGS
     }
     return context
