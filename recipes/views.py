@@ -80,7 +80,7 @@ def new(request):
                     title=ingredient), quantity=ingredients_dict[ingredient])
                 else:
                     messages.error(request, f"{ingredient} is not in our database and wont be added to you recipe")
-                return redirect('index')
+            return redirect('index')
     context = {'form': form}
     return render(request, 'new_recipe.html', context)
 
