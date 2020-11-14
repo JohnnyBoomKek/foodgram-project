@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = '*8z7b!7alf2@8-7q=@*!ec7vcjodaw6olayj!uw6e*h_0-i8qn'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DEBUG')
 
 ALLOWED_HOSTS = ['*', 'cachier.ga', 'www.cachier.ga']
 

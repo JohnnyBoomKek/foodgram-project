@@ -24,29 +24,37 @@ from reportlab.pdfgen import canvas
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 
-def get_tags(request, tags):
-    tag  = request.GET.get('tags')
-    if tag is not None:
-        if tag in tags:
-            tags.remove(tag)
-        else:
-            tags.append(tag)
-    list_of_tags = Tag.objects.filter(tag_name__in=tags)
-    return [list_of_tags, tags]
+def get_tag_url(tags, tag):
+    tags_local = tags.copy()
+    if tag in tags:
+        tags_local.remove(tag)
+    else:
+        tags_local.append(tag)
+    return ",".join(tags_local)
 
-def index(request,tagz=['B','L','D']):
-    
-    tags = get_tags(request, tagz)
+
+def index(request):
+    tags = request.GET.get('tags')
+    if tags is None:
+        tags = ['B', 'L', 'D']
+    else:
+        tags = tags.split(',')
+    tag_urls = {}
+    for tag in ['B', 'L', 'D']:
+        tag_urls[tag] = get_tag_url(tags, tag)
+    list_of_tags = Tag.objects.filter(tag_name__in=tags)
     recipe_list = Recipe.objects.all().order_by(
-        "-pub_date").filter(tags__in=tags[0]).distinct()
+        "-pub_date").distinct().filter(tags__in=list_of_tags)
     paginator = Paginator(recipe_list, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     context = {
         'page': page,
         'paginator': paginator,
-        'tags':tags[1]
+        'tags':tags,
+        'tag_urls':tag_urls
     }
+    
     return render(request, 'index.html', context)
 
 
@@ -79,7 +87,11 @@ def new(request):
                     RecipeIngredient.objects.create(recipe=new_recipe, ingredient=Ingredient.objects.get(
                     title=ingredient), quantity=ingredients_dict[ingredient])
                 else:
-                    messages.error(request, f"{ingredient} is not in our database and wont be added to you recipe")
+                    messages.error(request, f"{ingredient} нету в базе. сорян. попробуй еще раз.")
+                    form = RecipeForm(data=request.POST, instance=new_recipe)
+                    context = {'recipe': new_recipe,
+                                'form': form}
+                    return render(request, 'new_recipe.html', context)
             return redirect('index')
     context = {'form': form}
     return render(request, 'new_recipe.html', context)
@@ -160,7 +172,7 @@ def view_favorites(request, tags=['B','L','D']):
 
 @login_required
 def user_recipe(request, username, tags=['B','L','D']):
-    tags = get_tags(request, tags)
+    #tags = get_tags(request, tags)
     user = get_object_or_404(User, username=username)
     following = Follow.objects.filter(user=request.user).filter(author=user)
     recipe_list = Recipe.objects.filter(tags__in=tags[0]).distinct().filter(
