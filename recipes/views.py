@@ -34,8 +34,9 @@ def get_tags(request, tags):
     list_of_tags = Tag.objects.filter(tag_name__in=tags)
     return [list_of_tags, tags]
 
-def index(request, tags=['B','L','D']):
-    tags = get_tags(request, tags)
+def index(request,tagz=['B','L','D']):
+    
+    tags = get_tags(request, tagz)
     recipe_list = Recipe.objects.all().order_by(
         "-pub_date").filter(tags__in=tags[0]).distinct()
     paginator = Paginator(recipe_list, 6)
