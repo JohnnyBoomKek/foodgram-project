@@ -38,7 +38,6 @@ def index(request, tags=['B','L','D']):
     tags = get_tags(request, tags)
     recipe_list = Recipe.objects.all().order_by(
         "-pub_date").filter(tags__in=tags[0]).distinct()
-    print(recipe_list)
     paginator = Paginator(recipe_list, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -79,7 +78,7 @@ def new(request):
                     RecipeIngredient.objects.create(recipe=new_recipe, ingredient=Ingredient.objects.get(
                     title=ingredient), quantity=ingredients_dict[ingredient])
                 else:
-                    messages.error(request, f"{ingredient} is not in the data base and wont be added to you recipe")
+                    messages.error(request, f"{ingredient} is not in our database and wont be added to you recipe")
                 return redirect('index')
     context = {'form': form}
     return render(request, 'new_recipe.html', context)
@@ -141,28 +140,29 @@ def remove_favorites(request, id):
 
 
 @login_required
-def view_favorites(request):
-    list_of_tags = get_list_of_tags(request)
+def view_favorites(request, tags=['B','L','D']):
+    tags = get_tags(request, tags)
     user = request.user
-    recipe_list = user.favorite.all().order_by(
-        "-pub_date").filter(tags__in=list_of_tags).distinct()
+    recipe_list = user.favorite.all().filter(tags__in=tags[0]).distinct().order_by(
+        "-pub_date")
     paginator = Paginator(recipe_list, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
     context = {
         'page': page,
         'paginator': paginator,
-        'user': user
+        'user': user,
+        'tags':tags[1]
     }
     return render(request, 'index.html', context)
 
 
 @login_required
-def user_recipe(request, username):
-    list_of_tags = get_list_of_tags(request)
+def user_recipe(request, username, tags=['B','L','D']):
+    tags = get_tags(request, tags)
     user = get_object_or_404(User, username=username)
     following = Follow.objects.filter(user=request.user).filter(author=user)
-    recipe_list = Recipe.objects.filter(tags__in=list_of_tags).distinct().filter(
+    recipe_list = Recipe.objects.filter(tags__in=tags[0]).distinct().filter(
         author=user).order_by('-pub_date')
     paginator = Paginator(recipe_list, 6)
     page_number = request.GET.get('page')
@@ -171,7 +171,8 @@ def user_recipe(request, username):
         'page': page,
         'paginator': paginator,
         'user': user,
-        'following': following
+        'following': following,
+        'tags':tags[1]
     }
     return render(request, 'user_recipes.html', context)
 
