@@ -153,11 +153,19 @@ def remove_favorites(request, id):
 
 
 @login_required
-def view_favorites(request, tags=['B','L','D']):
-    tags = get_tags(request, tags)
+def view_favorites(request):
+    tags = request.GET.get('tags')
+    if tags is None:
+        tags = ['B', 'L', 'D']
+    else:
+        tags = tags.split(',')
+    tag_urls = {}
+    for tag in ['B', 'L', 'D']:
+        tag_urls[tag] = get_tag_url(tags, tag)
+    list_of_tags = Tag.objects.filter(tag_name__in=tags)
     user = request.user
-    recipe_list = user.favorite.all().filter(tags__in=tags[0]).distinct().order_by(
-        "-pub_date")
+    recipe_list = user.favorite.all().filter(tags__in=list_of_tags).order_by(
+        "-pub_date").distinct()
     paginator = Paginator(recipe_list, 6)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
@@ -165,17 +173,26 @@ def view_favorites(request, tags=['B','L','D']):
         'page': page,
         'paginator': paginator,
         'user': user,
-        'tags':tags[1]
+        'tags':tags,
+        'tag_urls':tag_urls
     }
     return render(request, 'index.html', context)
 
 
 @login_required
-def user_recipe(request, username, tags=['B','L','D']):
-    #tags = get_tags(request, tags)
+def user_recipe(request, username):
+    tags = request.GET.get('tags')
+    if tags is None:
+        tags = ['B', 'L', 'D']
+    else:
+        tags = tags.split(',')
+    tag_urls = {}
+    for tag in ['B', 'L', 'D']:
+        tag_urls[tag] = get_tag_url(tags, tag)
+    list_of_tags = Tag.objects.filter(tag_name__in=tags)
     user = get_object_or_404(User, username=username)
     following = Follow.objects.filter(user=request.user).filter(author=user)
-    recipe_list = Recipe.objects.filter(tags__in=tags[0]).distinct().filter(
+    recipe_list = Recipe.objects.filter(tags__in=list_of_tags).distinct().filter(
         author=user).order_by('-pub_date')
     paginator = Paginator(recipe_list, 6)
     page_number = request.GET.get('page')
@@ -185,7 +202,8 @@ def user_recipe(request, username, tags=['B','L','D']):
         'paginator': paginator,
         'user': user,
         'following': following,
-        'tags':tags[1]
+        'tags':tags,
+        'tag_urls':tag_urls
     }
     return render(request, 'user_recipes.html', context)
 
@@ -219,7 +237,8 @@ def remove_purchase(request, id):
 @login_required
 def shopping_list(request):
     user = request.user
-    return render(request, 'shopping_list.html')
+    context = {'user':user}
+    return render(request, 'shopping_list.html', context)
 
 
 @login_required
