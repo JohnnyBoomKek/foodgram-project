@@ -17,7 +17,7 @@
     {% for recipe in page %}
     {% include 'card.html' with recipe=recipe %}
     {% empty %}
-    <h3>Sorry, no recipies were found but you can create a new one <a href='{%url 'new' %}'>here</a>.</h3>
+    <h2> У Вас нет избранных рецептов. </h2>
     {% endfor %}
     <!-- recipies go here -->
     <!-- paginator goes gere -->
