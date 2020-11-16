@@ -30,8 +30,7 @@ services:
     env_file:
       - ./.env 
   nginx:
-  nginx:
-    image: nginx:alpine
+    image: nginx:1.19.4
     restart: always
     volumes:
       - staticfiles:/static
