@@ -88,12 +88,15 @@ def new(request):
                     title=ingredient), quantity=ingredients_dict[ingredient])
                 else:
                     messages.error(request, f"{ingredient} нету в базе. сорян. попробуй еще раз.")
+                    del ingredients_dict[ingredient]
                     form = RecipeForm(data=request.POST, instance=new_recipe)
+                    print(ingredients_dict)
                     context = {'recipe': new_recipe,
+                                "ingredients_dict":ingredients_dict,
                                 'form': form}
                     return render(request, 'new_recipe.html', context)
             return redirect('index')
-    context = {'form': form}
+    context = {'form': form,}
     return render(request, 'new_recipe.html', context)
 
 @login_required

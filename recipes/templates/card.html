@@ -1,4 +1,4 @@
-<div class="card" data-id={{ recipe.id }}>
+<div class="card" data-id={{ recipe.id }} data-author={{ recipe.author.id }}>
     {% csrf_token %} 
     {% load thumbnail %}
     {% thumbnail recipe.image "480x480" crop="center" upscale=True as im %}
@@ -26,7 +26,7 @@
     </div>
     {% if user.is_authenticated %}
     <div class="card__footer">
-        {% if recipe.purchases.all.count != 0 %}
+        {% if recipe.id in recipe_purchase %}
         <button class="button button_style_light-blue-outline" name="purchases"><span class="icon-check button__icon"></span> Рецепт добавлен</button>
         {% else %}
         <button class="button button_style_light-blue" name="purchases" data-out><span class="icon-plus button__icon "></span>Добавить в покупки</button>
@@ -38,4 +38,5 @@
         {% endif %}
     </div>
     {% endif %}
+
 </div>
