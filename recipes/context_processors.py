@@ -10,6 +10,7 @@ def add_variable_to_context(request):
             recipe_purchase.append(i.recipe.id)
     else:
         purchases = None
+        recipe_purchase = None
     context = {
         'purchases' : purchases,
         "recipe_purchase":recipe_purchase
